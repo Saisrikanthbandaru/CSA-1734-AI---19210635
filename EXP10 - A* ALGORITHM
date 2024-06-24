@@ -1,0 +1,56 @@
+import heapq
+
+def heuristic(current, goal):
+    # Manhattan distance heuristic
+    return abs(current[0] - goal[0]) + abs(current[1] - goal[1])
+
+def astar_search(grid, start, goal):
+    rows, cols = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    pq = [(0, start)]
+    came_from = {start: None}
+    cost_so_far = {start: 0}
+
+    while pq:
+        current_cost, current_node = heapq.heappop(pq)
+
+        if current_node == goal:
+            break
+
+        for dir in directions:
+            neighbor = (current_node[0] + dir[0], current_node[1] + dir[1])
+
+            # Check if neighbor is within bounds
+            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
+                new_cost = cost_so_far[current_node] + grid[neighbor[0]][neighbor[1]]
+
+                # Update cost if this path is cheaper
+                if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                    cost_so_far[neighbor] = new_cost
+                    priority = new_cost + heuristic(neighbor, goal)
+                    heapq.heappush(pq, (priority, neighbor))
+                    came_from[neighbor] = current_node
+
+    # Reconstruct path
+    path = []
+    node = goal
+    while node != start:
+        path.append(node)
+        node = came_from[node]
+    path.append(start)
+    path.reverse()
+
+    return path, cost_so_far[goal]
+
+# Example usage:
+grid = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+start = (0, 0)
+goal = (2, 2)
+
+path, cost = astar_search(grid, start, goal)
+print(f"Shortest Path: {path}")
+print(f"Cost: {cost}")
