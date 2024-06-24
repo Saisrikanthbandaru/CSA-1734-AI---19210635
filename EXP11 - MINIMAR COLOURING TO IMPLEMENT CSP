@@ -1,0 +1,44 @@
+def is_valid(graph, node, color, assignment):
+    for neighbor in graph[node]:
+        if neighbor in assignment and assignment[neighbor] == color:
+            return False
+    return True
+
+def backtrack(graph, colors, assignment={}):
+    if len(assignment) == len(graph):
+        return assignment
+
+    node = None
+    for n in graph:
+        if n not in assignment:
+            node = n
+            break
+
+    for color in colors:
+        if is_valid(graph, node, color, assignment):
+            assignment[node] = color
+            result = backtrack(graph, colors, assignment)
+            if result:
+                return result
+            del assignment[node]
+
+    return None
+
+# Example usage:
+graph = {
+    'WA': ['SA', 'NT'],
+    'NT': ['WA', 'SA', 'Q'],
+    'SA': ['WA', 'NT', 'Q', 'NSW', 'V'],
+    'Q': ['NT', 'SA', 'NSW'],
+    'NSW': ['Q', 'SA', 'V'],
+    'V': ['SA', 'NSW']
+}
+colors = ['Red', 'Green', 'Blue']
+
+solution = backtrack(graph, colors)
+if solution:
+    print("Map coloring solution:")
+    for node, color in solution.items():
+        print(f"{node}: {color}")
+else:
+    print("No solution found.")
