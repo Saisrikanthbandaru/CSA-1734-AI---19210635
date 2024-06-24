@@ -1,0 +1,67 @@
+from collections import deque
+
+def is_valid_state(state, capacities):
+    """Check if the state is valid."""
+    a, b = state
+    max_a, max_b = capacities
+    return 0 <= a <= max_a and 0 <= b <= max_b
+
+def bfs(capacities, target):
+    """Breadth-First Search to find the solution."""
+    max_a, max_b = capacities
+    visited = set()
+    queue = deque([(0, 0)])  # Initial state with both jugs empty
+    parent = {(0, 0): None}
+
+    while queue:
+        current = queue.popleft()
+        a, b = current
+
+        if current in visited:
+            continue
+        visited.add(current)
+
+        # Check if we reached the target
+        if a == target or b == target:
+            return get_solution_path(parent, current)
+
+        # Generate all possible states
+        next_states = [
+            (max_a, b),        # Fill Jug A
+            (a, max_b),        # Fill Jug B
+            (0, b),            # Empty Jug A
+            (a, 0),            # Empty Jug B
+            (a - min(a, max_b - b), b + min(a, max_b - b)),  # Pour A to B
+            (a + min(b, max_a - a), b - min(b, max_a - a))   # Pour B to A
+        ]
+
+        for state in next_states:
+            if is_valid_state(state, capacities) and state not in visited:
+                queue.append(state)
+                parent[state] = current
+
+    return None  # No solution found
+
+def get_solution_path(parent, end_state):
+    """Retrieve the path from the initial state to the end state."""
+    path = []
+    while end_state:
+        path.append(end_state)
+        end_state = parent[end_state]
+    path.reverse()
+    return path
+
+def main():
+    capacities = (4, 3)  # Capacities of the two jugs
+    target = 2           # Target amount of water
+
+    solution = bfs(capacities, target)
+    if solution:
+        print("Solution path:")
+        for state in solution:
+            print(state)
+    else:
+        print("No solution exists")
+
+if __name__ == "__main__":
+    main()
