@@ -1,0 +1,43 @@
+import math
+
+# Example evaluation function for a hypothetical game state
+def evaluate(state):
+    # This is a placeholder function, replace with actual evaluation function based on game rules
+    return sum(state)
+
+# Minimax algorithm without alpha-beta pruning
+def minimax(state, depth, maximizing_player):
+    if depth == 0 or game_over(state):
+        return evaluate(state)
+
+    if maximizing_player:
+        max_eval = -math.inf
+        for child_state in generate_states(state):
+            eval = minimax(child_state, depth - 1, False)
+            max_eval = max(max_eval, eval)
+        return max_eval
+    else:
+        min_eval = math.inf
+        for child_state in generate_states(state):
+            eval = minimax(child_state, depth - 1, True)
+            min_eval = min(min_eval, eval)
+        return min_eval
+
+# Example function to generate possible states from current state
+def generate_states(state):
+    # This is a placeholder function, replace with actual function to generate possible states
+    return [state + [i] for i in range(1, 4)]
+
+# Example function to check if game is over
+def game_over(state):
+    # This is a placeholder function, replace with actual function to determine game end condition
+    return len(state) >= 3
+
+# Example usage:
+initial_state = []
+depth = 3  # Depth of the search tree
+
+maximizing_player = True
+
+best_score = minimax(initial_state, depth, maximizing_player)
+print(f"Best score (Minimax): {best_score}")
