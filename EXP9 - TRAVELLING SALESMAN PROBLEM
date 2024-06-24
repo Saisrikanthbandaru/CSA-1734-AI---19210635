@@ -1,0 +1,34 @@
+import itertools
+
+def tsp_brute_force(distances, start_city):
+    num_cities = len(distances)
+    cities = list(range(num_cities))
+    cities.remove(start_city)
+    min_distance = float('inf')
+    best_path = None
+
+    for path in itertools.permutations(cities):
+        current_distance = 0
+        current_city = start_city
+        for next_city in path:
+            current_distance += distances[current_city][next_city]
+            current_city = next_city
+        current_distance += distances[current_city][start_city]
+
+        if current_distance < min_distance:
+            min_distance = current_distance
+            best_path = (start_city,) + path + (start_city,)
+
+    return min_distance, best_path
+
+# Example usage:
+distances = [
+    [0, 10, 15, 20],
+    [10, 0, 35, 25],
+    [15, 35, 0, 30],
+    [20, 25, 30, 0]
+]
+start_city = 0
+min_distance, best_path = tsp_brute_force(distances, start_city)
+print(f"Minimum Distance: {min_distance}")
+print(f"Best Path: {best_path}")
