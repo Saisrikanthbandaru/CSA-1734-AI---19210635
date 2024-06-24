@@ -1,0 +1,66 @@
+from collections import deque
+
+class State:
+    def __init__(self, missionaries, cannibals, boat):
+        self.missionaries = missionaries
+        self.cannibals = cannibals
+        self.boat = boat  # 0 if boat is at start, 1 if boat is at end
+
+    def __repr__(self):
+        return f"State({self.missionaries}, {self.cannibals}, {self.boat})"
+
+    def is_valid(self):
+        # Check if missionaries or cannibals are negative or exceed total on any side
+        if self.missionaries < 0 or self.cannibals < 0 or self.missionaries > 3 or self.cannibals > 3:
+            return False
+        # Check if missionaries are outnumbered by cannibals on either side
+        if self.missionaries > 0 and self.missionaries < self.cannibals:
+            return False
+        # Check if missionaries are outnumbered by cannibals on the other side
+        if 3 - self.missionaries > 0 and 3 - self.missionaries < 3 - self.cannibals:
+            return False
+        return True
+
+    def is_goal(self):
+        return self.missionaries == 0 and self.cannibals == 0 and self.boat == 1
+
+    def successors(self):
+        moves = [(1, 0), (2, 0), (0, 1), (0, 2), (1, 1)]
+        if self.boat == 1:
+            moves = [(-m, -c) for m, c in moves]
+
+        for m, c in moves:
+            new_state = State(self.missionaries + m, self.cannibals + c, 1 - self.boat)
+            if new_state.is_valid():
+                yield new_state
+
+def bfs():
+    initial_state = State(3, 3, 0)
+    queue = deque([([], initial_state)])  # Queue of (path, state)
+    visited = set()
+    visited.add(initial_state)
+
+    while queue:
+        path, current_state = queue.popleft()
+
+        if current_state.is_goal():
+            return path + [current_state]
+
+        for successor in current_state.successors():
+            if successor not in visited:
+                visited.add(successor)
+                queue.append((path + [current_state], successor))
+
+    return None
+
+def print_solution(path):
+    if not path:
+        print("No solution found")
+    else:
+        print("Solution:")
+        for i, state in enumerate(path):
+            print(f"Step {i + 1}: {state}")
+
+if __name__ == "__main__":
+    solution = bfs()
+    print_solution(solution)
